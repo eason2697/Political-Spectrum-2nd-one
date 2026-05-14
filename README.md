@@ -1,5 +1,9 @@
 # 🗺️ 政治思想測驗與分佈地圖 (Political Ideology Compass)
 
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=flat&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=flat&logo=javascript&logoColor=%23F7DF1E)
+
 這是一個基於 HTML、CSS 與純 JavaScript 開發的互動式「政治思想測驗」網頁應用程式。
 透過 25 道精心設計的問題，系統會計算出使用者的「經濟（左派/右派）」與「權力（威權/自由）」二維座標，並在互動式地圖上精準定位出最符合使用者的政治意識形態。
 
@@ -12,6 +16,13 @@
 - **精準的思想匹配**：內建超過 70 種以上的政治意識形態資料庫，透過畢氏定理（歐幾里得距離）計算出最貼近使用者的思想流派。
 - **動態視覺化地圖**：整合 `Plotly.js` 繪製高互動性的政治光譜地圖，並自動將使用者的測驗結果以 ⭐ 標記在地圖上。
 - **RWD 響應式設計**：完美適配手機與桌機版螢幕，擁有現代感的 UI/UX 設計。
+
+## 📸 系統截圖 (Screenshots)
+
+<!-- 建議在此處附上您的實際專案截圖，並移除註解 -->
+> 請將實際的專案畫面截圖放置於此，讓使用者在執行前就能預覽精緻的介面與地圖功能。
+> - **測驗介面**： `!測驗介面`
+> - **分析結果地圖**： `!結果地圖`
 
 ## 🛠️ 技術堆疊
 
@@ -53,4 +64,9 @@
 
 ---
 
+## 📜 聲明與授權 (License & Disclaimer)
+
+本專案僅作為學術用途與學習交流使用，題目與意識形態資料庫僅供參考。
+
+<br>
 *此為「程式設計概論」期末專題作品。*
