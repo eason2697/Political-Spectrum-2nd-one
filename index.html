@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>政治思想測驗</title>
+    <style>
+        * { box-sizing: border-box; } /* 確保 padding 不會撐破手機螢幕寬度 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, '微軟正黑體', sans-serif;
+            background-color: #f8fafc; /* 更柔和的現代淺灰藍底色 */
+            color: #1e293b;
+            margin: 0;
+            padding: 15px; /* 手機端邊距縮小 */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 35px 25px; /* 適配手機的內距 */
+            border-radius: 20px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); /* 現代感的大範圍柔和陰影 */
+            border: 1px solid #f1f5f9;
+            text-align: center;
+            margin-top: 20px;
+        }
+        h1 { margin-top: 0; color: #0f172a; font-weight: 800; font-size: 1.8rem; letter-spacing: -0.5px; }
+        .question-box { margin-bottom: 25px; display: none; }
+        .question-box.active { display: block; }
+        .question-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 24px; color: #334155; line-height: 1.5; }
+        .question-number { font-size: 0.9rem; color: #64748b; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn {
+            display: block; width: 100%; padding: 14px; margin: 8px 0;
+            border: none; border-radius: 10px; font-size: 1rem; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700; color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 平面化的輕微浮凸感 */
+        }
+        /* 重新調配具有現代感的按鈕色彩 */
+        .btn-strongly-agree { background-color: #059669; }
+        .btn-agree { background-color: #10b981; }
+        .btn-slightly-agree { background-color: #34d399; }
+        .btn-neutral { background-color: #94a3b8; }
+        .btn-slightly-disagree { background-color: #fb7185; }
+        .btn-disagree { background-color: #f43f5e; }
+        .btn-strongly-disagree { background-color: #e11d48; }
+        /* 懸停與點擊的動態回饋 */
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); opacity: 0.95; }
+        .btn:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        .btn-prev { background-color: #e2e8f0; color: #475569; margin-top: 20px; font-weight: 600; box-shadow: none; }
+        .btn-prev:hover { background-color: #cbd5e1; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); color: #1e293b; }
+
+        #result-box { display: none; }
+        .highlight { font-size: 1.8rem; color: #4f46e5; font-weight: 800; margin: 20px 0; }
+        .map-btn {
+            background-color: #3b82f6; color: white; text-decoration: none;
+            padding: 16px 30px; display: inline-block; border-radius: 12px;
+            font-weight: 700; margin-top: 25px; font-size: 1.1rem;
+            transition: all 0.3s; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+        .map-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); background-color: #2563eb; }
+        
+        /* 動畫效果：切換題目時由下往上淡入 */
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter {
+            animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 進度條樣式 */
+        .progress-bar {
+            width: 100%; background-color: #e2e8f0;
+            border-radius: 999px; height: 8px;
+            margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background-color: #3b82f6;
+            width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 999px;
+        }
+        /* 桌面端大螢幕適配 */
+        @media (min-width: 768px) {
+            .container { padding: 50px 60px; margin-top: 50px; }
+            h1 { font-size: 2.2rem; }
+            .question-text { font-size: 1.4rem; margin-bottom: 30px; }
+            .btn { padding: 18px; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>政治思想測驗</h1>
+    <!-- 新增進度條 -->
+    <div class="progress-bar" id="progress-container">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div id="quiz-container">
+        <!-- 題目會由 JavaScript 動態產生在這裡 -->
+    </div>
+    
+    <div id="result-box">
+        <h2>測驗完成！</h2>
+        <p>根據你的回答，最貼近你的政治思想是：</p>
+        <div class="highlight" id="closest-ideology">計算中...</div>
+        <p>你的座標：經濟 <span id="score-x">0</span> / 權力 <span id="score-y">0</span></p>
+        <!-- 將分數帶入 index.html -->
+        <a href="#" id="to-map-btn" class="map-btn">🗺️ 打開思想地圖看我的位置</a>
+    </div>
+</div>
+
+<script>
+    // 1. 定義題目清單與其對應的數值影響
+    // effect_x: 負值偏向左派(控制經濟)，正值偏向右派(自由市場)
+    // effect_y: 負值偏向自由(Libertarian)，正值偏向威權(Authoritarian)
+    const questions = [
+        { text: "政府應該全面控制並計畫市場經濟，以確保財富平均分配。", effect_x: -20, effect_y: 5 },
+        { text: "為了國家安全與社會穩定，政府監控人民的隱私是必要的。", effect_x: 0, effect_y: 20 },
+        { text: "無論性別、宗教或種族，每個人都應該享有絕對的婚姻與言論自由。", effect_x: 0, effect_y: -20 },
+        { text: "企業應該能夠完全自由競爭，政府不該課徵重稅或干預。", effect_x: 20, effect_y: 0 },
+        { text: "應該對富人徵收重稅，以提供全民基本收入和免費醫療。", effect_x: -15, effect_y: 0 },
+        { text: "毒品使用是個人選擇，政府應該將其除罪化或合法化。", effect_x: 0, effect_y: -15 },
+        { text: "國家應該有強大的軍隊，並在必要時主動介入他國事務以維護利益。", effect_x: 5, effect_y: 15 },
+        { text: "跨國企業的剝削是當今世界不平等的主要原因，必須受到嚴格限制。", effect_x: -15, effect_y: 5 },
+        { text: "傳統價值觀和宗教道德是社會穩定的基石，政府應該予以保護和提倡。", effect_x: 0, effect_y: 15 },
+        { text: "所有的土地和自然資源都應該由全體人民共同擁有，而非私人壟斷。", effect_x: -15, effect_y: 5 },
+        { text: "槍枝管制只會剝奪好人保護自己的權利，符合條件的平民有權持有武器。", effect_x: 5, effect_y: -15 },
+        { text: "政府應該提供更多的補貼來幫助弱勢群體，即使這意味著增加國債。", effect_x: -15, effect_y: 0 },
+        { text: "任何形式的審查制度都是對言論自由的侵犯，即使是仇恨言論也不該被封禁。", effect_x: 0, effect_y: -15 },
+        { text: "為了經濟發展，適度犧牲環境和放寬環保法規是可接受的。", effect_x: 15, effect_y: 0 },
+        { text: "同性伴侶應該與異性伴侶享有完全相同的合法收養小孩的權利。", effect_x: 0, effect_y: -15 },
+        { text: "維護法律與秩序比保障嫌疑犯的權利更重要。", effect_x: 0, effect_y: 15 },
+        { text: "醫療保健是基本人權，不應該被當作營利事業來經營。", effect_x: -15, effect_y: 0 },
+        { text: "自由市場的自動調節能力遠勝過政府官僚的計畫經濟。", effect_x: 15, effect_y: -5 },
+        { text: "國家元首或領袖應該擁有更高的決策權，以提高施政效率。", effect_x: 0, effect_y: 15 },
+        { text: "學校的教育應該交由市場和家長決定，政府不該強制規定統一課綱。", effect_x: 10, effect_y: -15 },
+        { text: "工會勢力過大會阻礙企業發展，政府應該限制工會的罷工權。", effect_x: 15, effect_y: 10 },
+        { text: "政府應該積極干預並打破大型企業的壟斷，以保護小商家的生存空間。", effect_x: -10, effect_y: 5 },
+        { text: "無論國籍為何，所有和平的移民都應該有權自由跨越國界工作和生活。", effect_x: 5, effect_y: -15 },
+        { text: "犯罪者應該受到嚴厲的懲罰，死刑是維持社會正義的必要手段。", effect_x: 0, effect_y: 15 },
+        { text: "最低工資法只會導致失業率上升，應該由勞資雙方自由協商薪資。", effect_x: 15, effect_y: -5 }
+    ];
+
+    let currentQuestion = 0;
+    let userScore = { x: 0, y: 0 };
+    let scoreHistory = []; // 新增：用來記錄每一步的分數，以便返回上一題
+    
+    // 將資料直接內建，確保任何環境 (包含本地直接點開) 都能成功讀取並計算，不報錯
+    const ideologyData = [
+        { "ideology": "波布主義", "x": -100, "y": 100 },
+        { "ideology": "史達林主義", "x": -95, "y": 100 },
+        { "ideology": "馬克思列寧主義", "x": -90, "y": 90 },
+        { "ideology": "主體思想", "x": -85, "y": 95 },
+        { "ideology": "毛澤東思想", "x": -80, "y": 85 },
+        { "ideology": "霍查主義", "x": -75, "y": 90 },
+        { "ideology": "斯特拉瑟主義", "x": -20, "y": 85 },
+        { "ideology": "納粹主義", "x": 10, "y": 100 },
+        { "ideology": "法西斯主義", "x": 30, "y": 90 },
+        { "ideology": "絕對君主制", "x": 20, "y": 80 },
+        { "ideology": "神權政治", "x": 10, "y": 90 },
+        { "ideology": "反動主義", "x": 40, "y": 85 },
+        { "ideology": "皮諾切特主義", "x": 60, "y": 90 },
+        { "ideology": "威權資本主義", "x": 80, "y": 80 },
+        { "ideology": "企業統治", "x": 100, "y": 90 },
+        { "ideology": "無政府共產主義", "x": -100, "y": -100 },
+        { "ideology": "無政府工團主義", "x": -90, "y": -80 },
+        { "ideology": "生態無政府主義", "x": -80, "y": -90 },
+        { "ideology": "自由意志社會主義", "x": -70, "y": -70 },
+        { "ideology": "無政府資本主義", "x": 100, "y": -100 },
+        { "ideology": "阿哥拉主義", "x": 90, "y": -90 },
+        { "ideology": "商業無政府主義", "x": 95, "y": -80 },
+        { "ideology": "加密無政府主義", "x": 85, "y": -85 },
+        { "ideology": "客觀主義", "x": 80, "y": -70 },
+        { "ideology": "托洛茨基主義", "x": -70, "y": 70 },
+        { "ideology": "狄托主義", "x": -50, "y": 50 },
+        { "ideology": "阿拉伯社會主義", "x": -30, "y": 60 },
+        { "ideology": "左翼民族主義", "x": -40, "y": 50 },
+        { "ideology": "國家工團主義", "x": -30, "y": 80 },
+        { "ideology": "生態威權主義", "x": -60, "y": 80 },
+        { "ideology": "家長式社會主義", "x": -40, "y": 30 },
+        { "ideology": "佛朗哥主義", "x": 30, "y": 75 },
+        { "ideology": "長槍黨主義", "x": 20, "y": 70 },
+        { "ideology": "新保守主義", "x": 50, "y": 60 },
+        { "ideology": "民族資本主義", "x": 60, "y": 50 },
+        { "ideology": "家長式保守主義", "x": 20, "y": 40 },
+        { "ideology": "右翼民粹主義", "x": 30, "y": 30 },
+        { "ideology": "互助主義", "x": -50, "y": -60 },
+        { "ideology": "社會生態學", "x": -60, "y": -50 },
+        { "ideology": "工團主義", "x": -50, "y": -40 },
+        { "ideology": "左翼自由意志主義", "x": -40, "y": -60 },
+        { "ideology": "基督教共產主義", "x": -70, "y": -30 },
+        { "ideology": "薩帕塔主義", "x": -80, "y": -50 },
+        { "ideology": "民主邦聯主義", "x": -75, "y": -65 },
+        { "ideology": "民主社會主義", "x": -40, "y": -20 },
+        { "ideology": "綠色政治", "x": -30, "y": -30 },
+        { "ideology": "烏托邦社會主義", "x": -60, "y": -20 },
+        { "ideology": "最小政府主義", "x": 70, "y": -60 },
+        { "ideology": "無政府邊疆主義", "x": 70, "y": -80 },
+        { "ideology": "地理自由意志主義", "x": 50, "y": -60 },
+        { "ideology": "蒼白自由意志主義", "x": 75, "y": -50 },
+        { "ideology": "科技自由意志主義", "x": 80, "y": -40 },
+        { "ideology": "粉紅資本主義", "x": 60, "y": -40 },
+        { "ideology": "流血心自由意志主義", "x": 40, "y": -40 },
+        { "ideology": "古典自由主義", "x": 60, "y": -30 },
+        { "ideology": "新自由意志主義", "x": 50, "y": -20 },
+        { "ideology": "激進中間派", "x": 0, "y": 0 },
+        { "ideology": "社會民主主義", "x": -20, "y": 0 },
+        { "ideology": "第三條道路", "x": 20, "y": 0 },
+        { "ideology": "新自由主義", "x": 40, "y": 10 },
+        { "ideology": "基督教民主主義", "x": 10, "y": 20 },
+        { "ideology": "技術官僚主義", "x": 0, "y": 40 },
+        { "ideology": "分配主義", "x": 0, "y": 20 },
+        { "ideology": "農業主義", "x": -10, "y": -10 },
+        { "ideology": "世界聯邦主義", "x": 0, "y": -20 },
+        { "ideology": "社會自由主義", "x": 10, "y": -20 },
+        { "ideology": "海盜政治", "x": 0, "y": -40 },
+        { "ideology": "直接民主", "x": 0, "y": -50 },
+        { "ideology": "正統馬克思主義", "x": -80, "y": 0 },
+        { "ideology": "左翼民粹主義", "x": -50, "y": 10 },
+        { "ideology": "盧森堡主義", "x": -85, "y": -20 },
+        { "ideology": "德萊昂主義", "x": -60, "y": -10 },
+        { "ideology": "泛無政府主義", "x": 0, "y": -90 },
+        { "ideology": "個人無政府主義", "x": -10, "y": -85 },
+        { "ideology": "利己無政府主義", "x": 0, "y": -95 },
+        { "ideology": "芝加哥學派", "x": 70, "y": -10 },
+        { "ideology": "奧地利學派", "x": 80, "y": -30 },
+        { "ideology": "國家資本主義", "x": 70, "y": 40 },
+        { "ideology": "自由市場保守主義", "x": 60, "y": 20 },
+        { "ideology": "新反動主義", "x": 60, "y": 70 }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+
+    // 2. 渲染題目
+    function renderQuestion(index) {
+        quizContainer.innerHTML = '';
+        
+        // 更新進度條
+        document.getElementById('progress-fill').style.width = ((index / questions.length) * 100) + '%';
+        const q = questions[index];
+        
+        const box = document.createElement('div');
+        /* 新增 animate-enter 讓切換題目時觸發動畫 */
+        box.className = 'question-box active animate-enter';
+        box.innerHTML = `
+            <div class="question-number">第 ${index + 1} / ${questions.length} 題</div>
+            <div class="question-text">${q.text}</div>
+            <button class="btn btn-strongly-agree" onclick="answer(1)">強烈同意</button>
+            <button class="btn btn-agree" onclick="answer(0.6)">同意</button>
+            <button class="btn btn-slightly-agree" onclick="answer(0.3)">有點同意</button>
+            <button class="btn btn-neutral" onclick="answer(0)">中立 / 跳過</button>
+            <button class="btn btn-slightly-disagree" onclick="answer(-0.3)">有點反對</button>
+            <button class="btn btn-disagree" onclick="answer(-0.6)">反對</button>
+            <button class="btn btn-strongly-disagree" onclick="answer(-1)">強烈反對</button>
+            ${index > 0 ? `<button class="btn btn-prev" onclick="prevQuestion()">🔙 上一題</button>` : ''}
+        `;
+        quizContainer.appendChild(box);
+    }
+
+    // 3. 處理作答並計分
+    window.answer = function(multiplier) {
+        const q = questions[currentQuestion];
+        // 紀錄當下分數，以便點擊上一題時返回
+        scoreHistory.push({ x: userScore.x, y: userScore.y });
+
+        userScore.x += q.effect_x * multiplier;
+        userScore.y += q.effect_y * multiplier;
+
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            renderQuestion(currentQuestion);
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            showResult();
+        }
+    };
+
+    // 新增：上一題功能
+    window.prevQuestion = function() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            // 恢復上一次的紀錄分數
+            const lastScore = scoreHistory.pop();
+            userScore.x = lastScore.x;
+            userScore.y = lastScore.y;
+            renderQuestion(currentQuestion);
+        }
+    };
+
+    // 4. 計算結果並顯示
+    function showResult() {
+        quizContainer.style.display = 'none';
+        document.getElementById('progress-container').style.display = 'none';
+        const resultBox = document.getElementById('result-box');
+        resultBox.style.display = 'block';
+        resultBox.classList.add('animate-enter'); // 結果浮現也套用動畫
+
+        // 限制分數在 -100 到 100 之間
+        userScore.x = Math.max(-100, Math.min(100, userScore.x));
+        userScore.y = Math.max(-100, Math.min(100, userScore.y));
+
+        document.getElementById('score-x').innerText = userScore.x.toFixed(1);
+        document.getElementById('score-y').innerText = userScore.y.toFixed(1);
+
+        // 利用畢氏定理找出距離最近的思想
+        let closest = null;
+        let minDistance = Infinity;
+
+        ideologyData.forEach(item => {
+            let dx = userScore.x - item.x;
+            let dy = userScore.y - item.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closest = item;
+            }
+        });
+        
+        document.getElementById('closest-ideology').innerText = closest.ideology;
+
+        // 設定跳轉按鈕的網址，帶上分數參數
+        const mapUrl = `map.html?x=${userScore.x}&y=${userScore.y}`;
+        document.getElementById('to-map-btn').href = mapUrl;
+    }
+
+    // 初始化測驗
+    renderQuestion(0);
+</script>
+</body>
+</html>

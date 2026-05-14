@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>光譜地圖</title>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: hidden; touch-action: none; }
+        
+        /* 獨立出的彈出視窗 CSS，讓 JS 更簡潔 */
+        #custom-popup {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.98);
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            width: 85%;
+            max-width: 400px;
+            font-family: sans-serif, "微軟正黑體";
+            color: #333;
+        }
+        .close-btn { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer; color: #888; }
+        .popup-content { max-height: 40vh; overflow-y: auto; touch-action: pan-y; font-size: 14px; line-height: 1.6; margin-bottom: 15px; padding-right: 5px; }
+        .popup-content p { margin: 5px 0; }
+        .search-btn { display: block; text-align: center; background: #283747; color: #fff; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <div id="custom-popup"></div>
+    
+    <!-- 這裡將會由 Python 動態注入 Plotly 的圖表程式碼 -->
+    {{ PLOTLY_GRAPH }}
+    
+    <script src="script.js"></script>
+</body>
+</html>
