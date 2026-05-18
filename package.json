@@ -5,7 +5,7 @@
   "main": "src/1st.py",
   "scripts": {
     "build": "python3 src/1st.py",
-    "serve": "live-server public",
+    "serve": "live-server",
     "dev": "npm run build && npm run serve"
   },
   "keywords": [],
