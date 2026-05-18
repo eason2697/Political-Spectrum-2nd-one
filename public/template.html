@@ -22,13 +22,15 @@
             z-index: 10000;
             width: 85%;
             max-width: 400px;
-            font-family: sans-serif, "微軟正黑體";
+            font-family: "微軟正黑體", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #333;
         }
-        .close-btn { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer; color: #888; }
+        .close-btn { position: absolute; top: 15px; right: 15px; border: none; background: none; font-size: 20px; cursor: pointer; color: #888; transition: color 0.2s; }
+        .close-btn:hover { color: #e11d48; } /* 懸停時變成警告的紅色 */
         .popup-content { max-height: 40vh; overflow-y: auto; touch-action: pan-y; font-size: 14px; line-height: 1.6; margin-bottom: 15px; padding-right: 5px; }
         .popup-content p { margin: 5px 0; }
-        .search-btn { display: block; text-align: center; background: #283747; color: #fff; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; }
+        .search-btn { display: block; text-align: center; background: #283747; color: #fff; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; transition: all 0.2s; }
+        .search-btn:hover { background: #1a252f; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>

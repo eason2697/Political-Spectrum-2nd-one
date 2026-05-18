@@ -33,10 +33,18 @@
 ## 📂 檔案結構
 
 ```text
-.
-├── index.html   # 測驗主程式（包含題目邏輯、計分機制與 UI）
-├── map.html     # 互動式地圖（Plotly.js 繪製，接收 URL 參數顯示落點）
-└── README.md    # 專案說明文件
+Political-Spectrum-2nd/
+├── src/                # 存放所有原始碼
+│   ├── 1st.py          # Python 資料處理與地圖生成腳本
+├── public/             # 存放靜態網頁檔案 (瀏覽器直接讀取的)
+│   ├── index.html      # 測驗主程式（包含題目邏輯、計分機制與 UI）
+│   ├── map.html        # 互動式地圖（Plotly.js 繪製，接收 URL 參數顯示落點，由 Python 生成）
+│   ├── script.js       # 前端地圖互動邏輯
+│   └── template.html   # Plotly 地圖的 HTML 模板
+├── data/               # 存放資料檔 (如 data.json)
+├── .gitignore          # 排除 node_modules, .DS_Store 等
+├── package.json        # 專案配置
+└── README.md           # 專案說明
 ```
 
 ## 🚀 如何執行 (How to Run)

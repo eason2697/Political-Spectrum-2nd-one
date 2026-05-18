@@ -2,10 +2,10 @@
   "name": "ideology-map",
   "version": "1.0.0",
   "description": "政治光譜地圖專案",
-  "main": "1st.py",
+  "main": "src/1st.py",
   "scripts": {
-    "build": "python3 1st.py",
-    "serve": "live-server",
+    "build": "python3 src/1st.py",
+    "serve": "live-server public",
     "dev": "npm run build && npm run serve"
   },
   "keywords": [],

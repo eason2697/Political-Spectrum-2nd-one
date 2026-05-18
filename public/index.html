@@ -34,7 +34,7 @@
         .question-text { font-size: 1.25rem; font-weight: 700; margin-bottom: 24px; color: #334155; line-height: 1.5; }
         .question-number { font-size: 0.9rem; color: #64748b; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
         .btn {
-            display: block; width: 100%; padding: 14px; margin: 8px 0;
+            display: block; width: 100%; padding: 12px; margin: 7px 0; /* 縮小按鈕垂直間距與內距 */
             border: none; border-radius: 10px; font-size: 1rem; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 700; color: white;
@@ -43,9 +43,7 @@
         /* 重新調配具有現代感的按鈕色彩 */
         .btn-strongly-agree { background-color: #059669; }
         .btn-agree { background-color: #10b981; }
-        .btn-slightly-agree { background-color: #34d399; }
         .btn-neutral { background-color: #94a3b8; }
-        .btn-slightly-disagree { background-color: #fb7185; }
         .btn-disagree { background-color: #f43f5e; }
         .btn-strongly-disagree { background-color: #e11d48; }
         /* 懸停與點擊的動態回饋 */
@@ -112,7 +110,10 @@
         <div class="highlight" id="closest-ideology">計算中...</div>
         <p>你的座標：經濟 <span id="score-x">0</span> / 權力 <span id="score-y">0</span></p>
         <!-- 將分數帶入 index.html -->
-        <a href="#" id="to-map-btn" class="map-btn">🗺️ 打開思想地圖看我的位置</a>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 25px;">
+            <a href="#" id="to-map-btn" class="map-btn" style="margin-top: 0;">🗺️ 打開思想地圖看我的位置</a>
+            <button onclick="window.location.reload();" class="map-btn" style="margin-top: 0; background-color: #64748b; box-shadow: 0 4px 10px rgba(100, 116, 139, 0.3); border: none; cursor: pointer;">🔄 重新做測驗</button>
+        </div>
     </div>
 </div>
 
@@ -151,91 +152,9 @@
     let currentQuestion = 0;
     let userScore = { x: 0, y: 0 };
     let scoreHistory = []; // 新增：用來記錄每一步的分數，以便返回上一題
-    
-    // 將資料直接內建，確保任何環境 (包含本地直接點開) 都能成功讀取並計算，不報錯
-    const ideologyData = [
-        { "ideology": "波布主義", "x": -100, "y": 100 },
-        { "ideology": "史達林主義", "x": -95, "y": 100 },
-        { "ideology": "馬克思列寧主義", "x": -90, "y": 90 },
-        { "ideology": "主體思想", "x": -85, "y": 95 },
-        { "ideology": "毛澤東思想", "x": -80, "y": 85 },
-        { "ideology": "霍查主義", "x": -75, "y": 90 },
-        { "ideology": "斯特拉瑟主義", "x": -20, "y": 85 },
-        { "ideology": "納粹主義", "x": 10, "y": 100 },
-        { "ideology": "法西斯主義", "x": 30, "y": 90 },
-        { "ideology": "絕對君主制", "x": 20, "y": 80 },
-        { "ideology": "神權政治", "x": 10, "y": 90 },
-        { "ideology": "反動主義", "x": 40, "y": 85 },
-        { "ideology": "皮諾切特主義", "x": 60, "y": 90 },
-        { "ideology": "威權資本主義", "x": 80, "y": 80 },
-        { "ideology": "企業統治", "x": 100, "y": 90 },
-        { "ideology": "無政府共產主義", "x": -100, "y": -100 },
-        { "ideology": "無政府工團主義", "x": -90, "y": -80 },
-        { "ideology": "生態無政府主義", "x": -80, "y": -90 },
-        { "ideology": "自由意志社會主義", "x": -70, "y": -70 },
-        { "ideology": "無政府資本主義", "x": 100, "y": -100 },
-        { "ideology": "阿哥拉主義", "x": 90, "y": -90 },
-        { "ideology": "商業無政府主義", "x": 95, "y": -80 },
-        { "ideology": "加密無政府主義", "x": 85, "y": -85 },
-        { "ideology": "客觀主義", "x": 80, "y": -70 },
-        { "ideology": "托洛茨基主義", "x": -70, "y": 70 },
-        { "ideology": "狄托主義", "x": -50, "y": 50 },
-        { "ideology": "阿拉伯社會主義", "x": -30, "y": 60 },
-        { "ideology": "左翼民族主義", "x": -40, "y": 50 },
-        { "ideology": "國家工團主義", "x": -30, "y": 80 },
-        { "ideology": "生態威權主義", "x": -60, "y": 80 },
-        { "ideology": "家長式社會主義", "x": -40, "y": 30 },
-        { "ideology": "佛朗哥主義", "x": 30, "y": 75 },
-        { "ideology": "長槍黨主義", "x": 20, "y": 70 },
-        { "ideology": "新保守主義", "x": 50, "y": 60 },
-        { "ideology": "民族資本主義", "x": 60, "y": 50 },
-        { "ideology": "家長式保守主義", "x": 20, "y": 40 },
-        { "ideology": "右翼民粹主義", "x": 30, "y": 30 },
-        { "ideology": "互助主義", "x": -50, "y": -60 },
-        { "ideology": "社會生態學", "x": -60, "y": -50 },
-        { "ideology": "工團主義", "x": -50, "y": -40 },
-        { "ideology": "左翼自由意志主義", "x": -40, "y": -60 },
-        { "ideology": "基督教共產主義", "x": -70, "y": -30 },
-        { "ideology": "薩帕塔主義", "x": -80, "y": -50 },
-        { "ideology": "民主邦聯主義", "x": -75, "y": -65 },
-        { "ideology": "民主社會主義", "x": -40, "y": -20 },
-        { "ideology": "綠色政治", "x": -30, "y": -30 },
-        { "ideology": "烏托邦社會主義", "x": -60, "y": -20 },
-        { "ideology": "最小政府主義", "x": 70, "y": -60 },
-        { "ideology": "無政府邊疆主義", "x": 70, "y": -80 },
-        { "ideology": "地理自由意志主義", "x": 50, "y": -60 },
-        { "ideology": "蒼白自由意志主義", "x": 75, "y": -50 },
-        { "ideology": "科技自由意志主義", "x": 80, "y": -40 },
-        { "ideology": "粉紅資本主義", "x": 60, "y": -40 },
-        { "ideology": "流血心自由意志主義", "x": 40, "y": -40 },
-        { "ideology": "古典自由主義", "x": 60, "y": -30 },
-        { "ideology": "新自由意志主義", "x": 50, "y": -20 },
-        { "ideology": "激進中間派", "x": 0, "y": 0 },
-        { "ideology": "社會民主主義", "x": -20, "y": 0 },
-        { "ideology": "第三條道路", "x": 20, "y": 0 },
-        { "ideology": "新自由主義", "x": 40, "y": 10 },
-        { "ideology": "基督教民主主義", "x": 10, "y": 20 },
-        { "ideology": "技術官僚主義", "x": 0, "y": 40 },
-        { "ideology": "分配主義", "x": 0, "y": 20 },
-        { "ideology": "農業主義", "x": -10, "y": -10 },
-        { "ideology": "世界聯邦主義", "x": 0, "y": -20 },
-        { "ideology": "社會自由主義", "x": 10, "y": -20 },
-        { "ideology": "海盜政治", "x": 0, "y": -40 },
-        { "ideology": "直接民主", "x": 0, "y": -50 },
-        { "ideology": "正統馬克思主義", "x": -80, "y": 0 },
-        { "ideology": "左翼民粹主義", "x": -50, "y": 10 },
-        { "ideology": "盧森堡主義", "x": -85, "y": -20 },
-        { "ideology": "德萊昂主義", "x": -60, "y": -10 },
-        { "ideology": "泛無政府主義", "x": 0, "y": -90 },
-        { "ideology": "個人無政府主義", "x": -10, "y": -85 },
-        { "ideology": "利己無政府主義", "x": 0, "y": -95 },
-        { "ideology": "芝加哥學派", "x": 70, "y": -10 },
-        { "ideology": "奧地利學派", "x": 80, "y": -30 },
-        { "ideology": "國家資本主義", "x": 70, "y": 40 },
-        { "ideology": "自由市場保守主義", "x": 60, "y": 20 },
-        { "ideology": "新反動主義", "x": 60, "y": 70 }
-    ];
 
+    // 優化：建立一個全域變數來儲存從外部檔案讀取的思想資料
+    let ideologyData = [];
     const quizContainer = document.getElementById('quiz-container');
 
     // 2. 渲染題目
@@ -254,12 +173,14 @@
             <div class="question-text">${q.text}</div>
             <button class="btn btn-strongly-agree" onclick="answer(1)">強烈同意</button>
             <button class="btn btn-agree" onclick="answer(0.6)">同意</button>
-            <button class="btn btn-slightly-agree" onclick="answer(0.3)">有點同意</button>
             <button class="btn btn-neutral" onclick="answer(0)">中立 / 跳過</button>
-            <button class="btn btn-slightly-disagree" onclick="answer(-0.3)">有點反對</button>
             <button class="btn btn-disagree" onclick="answer(-0.6)">反對</button>
             <button class="btn btn-strongly-disagree" onclick="answer(-1)">強烈反對</button>
             ${index > 0 ? `<button class="btn btn-prev" onclick="prevQuestion()">🔙 上一題</button>` : ''}
+            <div style="display: flex; gap: 10px; margin-top: ${index > 0 ? '10px' : '20px'};">
+                <button class="btn btn-prev" style="margin-top: 0; flex: 1;" onclick="window.location.reload();">🔄 重新測驗</button>
+                <button class="btn btn-prev" style="margin-top: 0; flex: 1;" onclick="window.location.href='map.html';">🗺️ 跳過測驗</button>
+            </div>
         `;
         quizContainer.appendChild(box);
     }
@@ -309,6 +230,12 @@
         document.getElementById('score-x').innerText = userScore.x.toFixed(1);
         document.getElementById('score-y').innerText = userScore.y.toFixed(1);
 
+        // 檢查思想資料是否已成功載入
+        if (ideologyData.length === 0) {
+            document.getElementById('closest-ideology').innerText = '資料載入失敗...';
+            return;
+        }
+
         // 利用畢氏定理找出距離最近的思想
         let closest = null;
         let minDistance = Infinity;
@@ -330,8 +257,26 @@
         document.getElementById('to-map-btn').href = mapUrl;
     }
 
-    // 初始化測驗
-    renderQuestion(0);
+    // 優化：建立一個非同步函式來初始化測驗
+    // 它會先去讀取外部的 data.json，成功後才開始渲染第一題
+    async function initializeQuiz() {
+        try {
+            const response = await fetch('data/data.json'); // live-server 會從 public/ 開始找
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            ideologyData = await response.json();
+            // 資料成功載入後，才開始測驗
+            renderQuestion(0);
+        } catch (error) {
+            console.error("無法載入思想資料:", error);
+            quizContainer.innerHTML = `<div class="question-text" style="color: #e11d48;">錯誤：無法載入測驗資料，請檢查網路連線或主控台錯誤訊息。</div>`;
+            document.getElementById('progress-container').style.display = 'none';
+        }
+    }
+
+    // 執行初始化
+    initializeQuiz();
 </script>
 </body>
 </html>
